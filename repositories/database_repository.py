@@ -95,7 +95,6 @@ def init_crash_db():
         )
 
 
-
 def add_indexes():
     region_injuries.create_index([('region', 1)])
 
@@ -106,6 +105,10 @@ def add_indexes():
 
     monthly_injuries.create_index([('month', 1)])
     monthly_injuries.create_index([('month', 1), ('region_injuries.region', 1)])
+
+def init_db_with_indexes():
+    init_crash_db()
+    add_indexes()
 
 
 if __name__ == '__main__':
