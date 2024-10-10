@@ -19,7 +19,7 @@ def init_crash_db():
             'fatal_injuries': fatal_injuries,
             'non_fatal_injuries': non_fatal_injuries,
             'injuries_list': [
-                row['MOST_SEVERE_INJURY']
+                row['CRASH_TYPE']
             ]
         }
 
@@ -31,8 +31,8 @@ def init_crash_db():
                     'fatal_injuries': fatal_injuries,
                     'non_fatal_injuries': non_fatal_injuries
                 },
-                '$push': {
-                    'injuries_list': row['MOST_SEVERE_INJURY']
+                '$addToSet': {
+                    'injuries_list': row['CRASH_TYPE']
                 }
             },
             upsert=True
@@ -49,37 +49,34 @@ def init_crash_db():
         )
 
         daily_injuries.update_one(
-            {'date': row['CRASH_DATE'], 'region_injuries.region': row['BEAT_OF_OCCURRENCE']},
+            {'date': row['CRASH_DATE'].split()[0], 'region_injuries.region': row['BEAT_OF_OCCURRENCE']},
             {
                 '$inc': {
-                    'region_injuries.$.injuries_total': injuries_data['injuries_total']
+                    'region_injuries.$.injuries_total': injuries_total
                 }
             }
         )
 
         daily_injuries.update_one(
-            {'date': row['CRASH_DATE']},
+            {'date': row['CRASH_DATE'].split()[0]},
             {
                 '$addToSet': {
                     'region_injuries': {
                         'region': row['BEAT_OF_OCCURRENCE'],
-                        'injuries_total': injuries_data['injuries_total']
+                        'injuries_total': 1 if injuries_total == 0 else injuries_total
                     }
                 }
             },
             upsert=True
         )
 
-        month = row['CRASH_DATE'][3:5]
-        injuries_data = {
-            'injuries_total': int(row['INJURIES_TOTAL']) if row['INJURIES_TOTAL'].strip() else 0
-        }
+        month = row['CRASH_DATE'][0:2]
 
         monthly_injuries.update_one(
             {'month': month, 'region_injuries.region': row['BEAT_OF_OCCURRENCE']},
             {
                 '$inc': {
-                    'region_injuries.$.injuries_total': injuries_data['injuries_total']
+                    'region_injuries.$.injuries_total': injuries_total
                 }
             }
         )
@@ -90,13 +87,16 @@ def init_crash_db():
                 '$addToSet': {
                     'region_injuries': {
                         'region': row['BEAT_OF_OCCURRENCE'],
-                        'injuries_total': injuries_data['injuries_total']
+                        'injuries_total': 1 if injuries_total == 0 else injuries_total
                     }
                 }
             },
             upsert=True
         )
 
+
+
+def add_indexes():
     region_injuries.create_index([('region', 1)])
 
     region_cause_of_death.create_index([('region', 1)])
@@ -110,3 +110,5 @@ def init_crash_db():
 
 if __name__ == '__main__':
     init_crash_db()
+    add_indexes()
+    pass
