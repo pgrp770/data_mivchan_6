@@ -43,3 +43,8 @@ def test_get_injury_by_date_and_region_api(client):
 def test_get_injuries_in_week_from_date_and_region_api(client):
     response = client.get('/get_injuries_in_week_from_date_and_region/225?date=09/05/2023')
     assert response.status_code == 200
+
+
+def test_init_db_api(client):
+    response = client.get('/init')
+    assert response.status_code == 200
