@@ -2,13 +2,13 @@ from database.connect import region_injuries, region_cause_of_death, daily_injur
 from services.csv_service import read_csv
 
 
-def init_crash_db():
+def init_crash_db(path):
     region_injuries.drop()
     region_cause_of_death.drop()
     daily_injuries.drop()
     monthly_injuries.drop()
 
-    for row in read_csv('../assets/data.csv'):
+    for row in read_csv(path):
         injuries_total = int(row['INJURIES_TOTAL']) if row['INJURIES_TOTAL'].strip() else 0
         fatal_injuries = int(row['INJURIES_FATAL'].strip()) if row['INJURIES_FATAL'].strip() else 0
         non_fatal_injuries = int(row['INJURIES_NON_INCAPACITATING'].strip()) if row[
@@ -106,12 +106,10 @@ def add_indexes():
     monthly_injuries.create_index([('month', 1)])
     monthly_injuries.create_index([('month', 1), ('region_injuries.region', 1)])
 
-def init_db_with_indexes():
-    init_crash_db()
-    add_indexes()
+
 
 
 if __name__ == '__main__':
-    init_crash_db()
+    init_crash_db('../assets/data.csv')
     add_indexes()
     pass

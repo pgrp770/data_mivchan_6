@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from returns.maybe import Maybe
 from returns.result import Success
 
-from repositories.database_repository import init_db_with_indexes
+from repositories.database_repository import init_crash_db, add_indexes
 from repositories.injury_repository import get_injury_by_region, get_injury_reason_by_region, get_injury_statistic, \
     get_injury_by_month_and_region, get_injury_by_date_and_region, get_injuries_in_week_from_date_and_region
 
@@ -58,5 +58,6 @@ def get_injuries_in_week_from_date_and_region_api(region: str):
 
 @injury_blueprint.route('/init', methods=['GET'])
 def init_db_api():
-    init_db_with_indexes()
+    init_crash_db('C:\\Users\\pgrp7\\OneDrive\\Desktop\\Data\\6\\mivchan_6_injuries\\assets\\data.csv')
+    add_indexes()
     return jsonify({"message": "success"}), 200
