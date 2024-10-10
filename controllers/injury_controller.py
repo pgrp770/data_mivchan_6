@@ -3,7 +3,7 @@ from returns.maybe import Maybe
 from returns.result import Success
 from repositories.injury_repository import get_injury_by_region, get_injury_reason_by_region, get_injury_statistic, \
     get_injury_by_month_and_region, get_injury_by_date_and_region, get_injuries_in_week_from_date_and_region
-from bson import ObjectId
+
 
 injury_blueprint = Blueprint('car', __name__)
 
