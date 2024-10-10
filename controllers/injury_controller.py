@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from returns.maybe import Maybe
 from returns.result import Success
-from repositories.injury_repository import get_injury_by_region, get_injury_reason_by_region, get_injury_statistic
+from repositories.injury_repository import get_injury_by_region, get_injury_reason_by_region, get_injury_statistic, \
+    get_injury_by_month_and_region, get_injury_by_date_and_region, get_injuries_in_week_from_date_and_region
 from bson import ObjectId
 
 injury_blueprint = Blueprint('car', __name__)
@@ -25,3 +26,24 @@ def get_injury_statistic_api(region: str):
     res = get_injury_statistic(region)
     res["_id"] = str(res["_id"])
     return jsonify(res), 200
+
+
+@injury_blueprint.route('/get_injury_by_month_and_region/<string:month>/<string:region>', methods=['GET'])
+def get_injury_by_month_and_region_api(month: str, region: str):
+    res = get_injury_by_month_and_region(month, region)
+
+    return jsonify(res), 200
+
+
+@injury_blueprint.route('/get_injury_by_date_and_region/<string:region>', methods=['GET'])
+def get_injury_by_date_and_region_api(region: str):
+    date = request.args.get('date', type=str)
+    res = get_injury_by_date_and_region(date, region)
+    return jsonify(res), 200
+
+
+@injury_blueprint.route('/get_injuries_in_week_from_date_and_region/<string:region>', methods=['GET'])
+def get_injuries_in_week_from_date_and_region_api(region: str):
+    start_date = request.args.get('date', type=str)
+    res = get_injuries_in_week_from_date_and_region(start_date, region)
+    return jsonify({f"injuries": res}), 200
